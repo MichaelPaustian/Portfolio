@@ -1,6 +1,6 @@
 setwd('C:\\Users\\mpaus\\Documents\\Sports Science XC Well and Strava\\Strava\\Mileage Folder\\Year Review\\Charles Hicks')
 
-df_CharlesHicks <- ldply(.data = list.files(pattern = "*.csv"),
+df <- ldply(.data = list.files(pattern = "*.csv"),
                          .fun = read_csv)%>%
   select('Type','Activity','Location','Name','Date','Distance','Pace','Duration','EstPace')%>%
   mutate(DateReal=word(Date, 1, sep = " "),
@@ -8,17 +8,17 @@ df_CharlesHicks <- ldply(.data = list.files(pattern = "*.csv"),
          Month= months.Date(Date),
          Year= word(Date, 1, sep = "-"))%>%
   select(-'DateReal')%>%
-  filter(Name == "Charles Hicks",
+  filter(Name == "",
          Type %in% c("unknown","Run"))
 
 
 
-df_CharlesHicks2 <- df_CharlesHicks %>%
+df2 <- df %>%
   distinct(Activity, .keep_all = TRUE ) %>%
   filter(Date < "2023-4-1",
          Date >"2022-5-31")
 
-CharlesHicksfinal <- df_CharlesHicks2 %>%
+dffinal <- df2 %>%
   select(-'Location',-'Activity')%>%
   dplyr::group_by(Name, Date)%>%
   dplyr::summarise(Total_Distance=round(sum(Distance),0),
@@ -70,12 +70,12 @@ CharlesHicksfinal <- df_CharlesHicks2 %>%
          Month = months.Date(Date),
          Week_Day=weekdays.Date(Date))
 
-CharlesHicksWeek <- CharlesHicksfinal %>%
+dfWeek <- dffinal %>%
   dplyr::group_by(Week) %>%
   dplyr::summarise(Mileage_For_Week= round(sum(Total_Distance),0),
                    Avg_Pace=round(mean(Pace/60),2)) 
 
-CharlesHicksMonth <- CharlesHicksfinal %>%
+dfmonth <- dffinal %>%
   dplyr::group_by(Month) %>%
   dplyr::summarise(Mileage_For_Month= round(sum(Total_Distance),0))
 
